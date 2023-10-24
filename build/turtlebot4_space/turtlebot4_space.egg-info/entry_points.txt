@@ -1,0 +1,4 @@
+[console_scripts]
+draw_square = turtlebot4_space.draw_square:main
+draw_square_1 = turtlebot4_space.draw_square_1:main
+

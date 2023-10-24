@@ -1,0 +1,17 @@
+[0.997s] Invoking command in '/home/anna/ros2_ws/build/turtlebot4_space': PYTHONPATH=/home/anna/ros2_ws/build/turtlebot4_space/prefix_override:/home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/anna/ros2_ws/build/turtlebot4_space/build --no-deps install_data
+[1.237s] running develop
+[1.376s] running egg_info
+[1.377s] writing turtlebot4_space.egg-info/PKG-INFO
+[1.377s] writing dependency_links to turtlebot4_space.egg-info/dependency_links.txt
+[1.377s] writing entry points to turtlebot4_space.egg-info/entry_points.txt
+[1.377s] writing requirements to turtlebot4_space.egg-info/requires.txt
+[1.377s] writing top-level names to turtlebot4_space.egg-info/top_level.txt
+[1.379s] reading manifest file 'turtlebot4_space.egg-info/SOURCES.txt'
+[1.379s] writing manifest file 'turtlebot4_space.egg-info/SOURCES.txt'
+[1.381s] running build_ext
+[1.381s] Creating /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4-space.egg-link (link to .)
+[1.382s] Installing draw_square script to /home/anna/ros2_ws/install/turtlebot4_space/lib/turtlebot4_space
+[1.382s] 
+[1.383s] Installed /home/anna/ros2_ws/build/turtlebot4_space
+[1.383s] running install_data
+[1.466s] Invoked command in '/home/anna/ros2_ws/build/turtlebot4_space' returned '0': PYTHONPATH=/home/anna/ros2_ws/build/turtlebot4_space/prefix_override:/home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/anna/ros2_ws/build/turtlebot4_space/build --no-deps install_data
