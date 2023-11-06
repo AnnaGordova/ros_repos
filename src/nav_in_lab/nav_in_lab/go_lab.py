@@ -63,7 +63,7 @@ class LaserScanSubscriberNode(Node):
         self.get_logger().info(str(self.AngRangeList[minlenind].get_angle()) + " " + str(self.AngRangeList[0].get_angle()))
         self.cmd_vel_pub_.publish(msg)    
             
-        r
+        self.get_logger().info("jhkjh")
         
         
 
