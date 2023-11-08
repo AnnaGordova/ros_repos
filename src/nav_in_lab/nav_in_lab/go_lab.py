@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
+from rclpy.task import Future
 
 class LaserAngleAndDistance: #класс угол-расстояние
     
@@ -19,9 +20,19 @@ class LaserAngleAndDistance: #класс угол-расстояние
     
     def get_range(self):
         return self.range
-    
+class Very_talkative_Node(Node):
+    def __init__(self):
+        self.f = Future()
+        super().__init__("Talkative_Node")
+        self.laser_subscriber_ = self.create_subscription(LaserScan, "/scan", self.laser_callback, 10)
+        self.cmd_vel_pub_ = self.create_publisher(Twist, "/cmd_vel", 10)
+    def laser_callback(self, msg: LaserScan):
+        self.get_logger().info("I am very talkative node!") 
+        self.f.set_result(1)
+       
 class LaserScanSubscriberNode(Node):
     def __init__(self):
+        self.st1 = Future()
         super().__init__("Laser_subscriber")
         self.laser_subscriber_ = self.create_subscription(LaserScan, "/scan", self.laser_callback, 10)
         self.cmd_vel_pub_ = self.create_publisher(Twist, "/cmd_vel", 10)
@@ -88,6 +99,7 @@ class TurnToRightSide(LaserScanSubscriberNode):
             msg.angular.z = 0.35
         else:
             msg.angular.z = 0.0
+            self.st1.set_result(1)
         self.get_logger().info(str(self.AngRangeList[minlenind].get_angle()) + " " + str(self.AngRangeList[0].get_angle()))
         self.cmd_vel_pub_.publish(msg)    
             
@@ -133,6 +145,11 @@ class GoForward(LaserScanSubscriberNode):
 def main(args=None):
     rclpy.init(args=args)
     node = TurnToRightSide()
+    node1 = Very_talkative_Node()
+    rclpy.spin_until_future_complete(node, node.st1)
+    #переключение нод через глобальные переменные или поле статус класса
     #node = GoForward()
-    rclpy.spin(node)
+    #rclpy.spin_until_future_complete(node1, node1.f)
+    #rclpy.spin(node)
+    #rclpy.spin(node1)
     rclpy.shutdown()
