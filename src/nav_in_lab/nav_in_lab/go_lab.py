@@ -152,7 +152,7 @@ class GoForward(LaserScanSubscriberNode):
         min_acceptable_range = min(self.AngRangeList[i].get_range() for i in self.need_indexes)
         self.get_logger().info(str(min_acceptable_range))
         msg = Twist()
-        if min_acceptable_range > 1:
+        if min_acceptable_range > 0.6:
             msg.linear.x = 1.0
             self.get_logger().info("Riding...")
         else:
@@ -160,6 +160,46 @@ class GoForward(LaserScanSubscriberNode):
             self.st2.set_result(1)
             self.get_logger().info("I am near the wall")
         self.cmd_vel_pub_.publish(msg)
+
+class TurnAlongTheWall(LaserScanSubscriberNode):
+    
+    def laser_callback(self, msg: LaserScan):
+        self.angle_min = msg.angle_min #задаем поля для углов
+        self.angle_max = msg.angle_max
+        self.angle_increment = msg.angle_increment
+        
+        ranges = msg.ranges #список расстояний
+        angle_list = [] #список углов
+        temp = self.angle_min
+        while temp <= self.angle_max: #заполняем спсиок промежуточных значений углов 
+            angle_list.append(temp)
+            temp += self.angle_increment
+
+        self.AngRangeList = [] #спсиок объектов класса угол-расстояние
+   
+        for i in range(0, len(angle_list)): #заполянем
+            self.AngRangeList.append(LaserAngleAndDistance(angle_list[i], ranges[i]))
+        
+        '''
+        for i in range(0, len(self.AngRangeList)): # вывод для красоты
+            self.get_logger().info(self.AngRangeList[i].toStr())'''
+        
+        
+        #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
+
+        #------------------------------------------------- закончили обработку входных данных
+        minlenind = ranges.index(min(ranges))
+        msg = Twist()
+        
+        d = abs(self.AngRangeList[minlenind].get_angle() - self.AngRangeList[0].get_angle()) 
+        if not(6.28 - 3.14/2 - 0.2 <= d < 6.28 - 3.14/2 ):
+            msg.angular.z = 0.35
+        else:
+            msg.angular.z = 0.0
+            self.st3.set_result(1)
+        self.get_logger().info(str(self.AngRangeList[minlenind].get_angle()) + " " + str(self.AngRangeList[0].get_angle()))
+        self.cmd_vel_pub_.publish(msg)   
+        
 
 def main(args=None):
     rclpy.init(args=args)
@@ -171,5 +211,8 @@ def main(args=None):
 
     node2 = GoForward()
     rclpy.spin_until_future_complete(node2, node2.st2)
-    
+
+    node3 = TurnAlongTheWall()
+    rclpy.spin_until_future_complete(node3, node3.st3)
+    #print(node2.AngRangeList[int(3.14)].get_angle())
     rclpy.shutdown()
