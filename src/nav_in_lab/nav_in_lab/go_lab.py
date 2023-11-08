@@ -20,6 +20,8 @@ class LaserAngleAndDistance: #класс угол-расстояние
     
     def get_range(self):
         return self.range
+    
+    
 class Very_talkative_Node(Node):
     def __init__(self):
         self.f = Future()
@@ -29,14 +31,29 @@ class Very_talkative_Node(Node):
     def laser_callback(self, msg: LaserScan):
         self.get_logger().info("I am very talkative node!") 
         self.f.set_result(1)
+        
        
 class LaserScanSubscriberNode(Node):
     def __init__(self):
         self.st1 = Future()
+        self.st2 = Future()
+        self.st3 = Future()
+        self.st4 = Future()
         super().__init__("Laser_subscriber")
         self.laser_subscriber_ = self.create_subscription(LaserScan, "/scan", self.laser_callback, 10)
         self.cmd_vel_pub_ = self.create_publisher(Twist, "/cmd_vel", 10)
 
+    def get_st1(self):
+        return self.st1
+    
+    def get_st2(self):
+        return self.st1
+    
+    def get_st3(self):
+        return self.st1
+    
+    def get_st4(self):
+        return self.st1
 
     def laser_callback(self, msg: LaserScan):
         self.angle_min = msg.angle_min #задаем поля для углов
@@ -95,7 +112,7 @@ class TurnToRightSide(LaserScanSubscriberNode):
         msg = Twist()
         
         d = abs(self.AngRangeList[minlenind].get_angle() - self.AngRangeList[0].get_angle()) 
-        if not(0.0 <= d < 0.5):
+        if not(0.0 <= d < 0.2):
             msg.angular.z = 0.35
         else:
             msg.angular.z = 0.0
@@ -137,19 +154,22 @@ class GoForward(LaserScanSubscriberNode):
         msg = Twist()
         if min_acceptable_range > 1:
             msg.linear.x = 1.0
-            self.get_logger().info("ad")
+            self.get_logger().info("Riding...")
         else:
             msg.linear.x = 0.0
+            self.st2.set_result(1)
+            self.get_logger().info("I am near the wall")
         self.cmd_vel_pub_.publish(msg)
 
 def main(args=None):
     rclpy.init(args=args)
-    node = TurnToRightSide()
-    node1 = Very_talkative_Node()
-    rclpy.spin_until_future_complete(node, node.st1)
-    #переключение нод через глобальные переменные или поле статус класса
-    #node = GoForward()
+    #nodet = Very_talkative_Node()
     #rclpy.spin_until_future_complete(node1, node1.f)
-    #rclpy.spin(node)
-    #rclpy.spin(node1)
+
+    node1 = TurnToRightSide() 
+    rclpy.spin_until_future_complete(node1, node1.st1)
+
+    node2 = GoForward()
+    rclpy.spin_until_future_complete(node2, node2.st2)
+    
     rclpy.shutdown()
