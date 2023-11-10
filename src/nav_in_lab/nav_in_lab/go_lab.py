@@ -4,7 +4,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
 from rclpy.task import Future
-
+FREE_SPACE = -1 # -1 - не определено, 1 - свободно справа, 0 - свободно слева, а справа нет, 2 - только разворот
 class LaserAngleAndDistance: #класс угол-расстояние
     
     def __init__(self, angle, range):
@@ -42,6 +42,8 @@ class LaserScanSubscriberNode(Node):
         self.st4_pi2 = Future()
         self.st4_3pi2 = Future()
         self.st4_turn2pi = Future()
+
+        
         super().__init__("Laser_subscriber")
         self.laser_subscriber_ = self.create_subscription(LaserScan, "/scan", self.laser_callback, 10)
         self.cmd_vel_pub_ = self.create_publisher(Twist, "/cmd_vel", 10)
@@ -52,12 +54,16 @@ class LaserScanSubscriberNode(Node):
     def get_st4_f(self): return self.st4_f   
     def get_st4_pi2(self): return self.st4_pi2    
     def get_st4_3pi2(self): return self.st4_3pi2    
-    def get_st4_turn2pi(self): return self.st4_turn2pi
+    def get_st4_turnpi(self): return self.st4_turnpi
+
+    
 
     def set_st4_f(self, f): self.st4_f = f
     def set_st4_pi2(self, f): self.st4_pi2 = f
     def set_st4_3pi2(self, f): self.st4_3pi2 = f
-    def set_st4_turn2pi(self, f): self.st4_turn2pi = f
+    def set_st4_turnpi(self, f): self.st4_turnpi = f
+
+
 
     def laser_callback(self, msg: LaserScan):
         self.angle_min = msg.angle_min #задаем поля для углов
@@ -205,7 +211,10 @@ class TurnAlongTheWall(LaserScanSubscriberNode):
         self.cmd_vel_pub_.publish(msg)   
         
 class RightHandRule_Forward(LaserScanSubscriberNode):
+    
     def laser_callback(self, msg: LaserScan):
+        global FREE_SPACE
+
         self.angle_min = msg.angle_min #задаем поля для углов
         self.angle_max = msg.angle_max
         self.angle_increment = msg.angle_increment
@@ -246,21 +255,37 @@ class RightHandRule_Forward(LaserScanSubscriberNode):
             msg.linear.x = 0.3
             self.get_logger().info("Chu-chu!" + " " + str(self.AngRangeList[0].get_range()))
             if self.AngRangeList[ind3pi2].get_range() > 0.6:
-                msg.angular.z = -0.05
+                msg.angular.z = 0.05
                 self.get_logger().info("Calibration 1..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
             if self.AngRangeList[ind3pi2].get_range() < 0.5:
-                msg.angular.z = 0.05
+                msg.angular.z = -0.05
                 self.get_logger().info("Calibration 2..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
         else:
             msg.linear.x = 0.0
             self.get_logger().info("Stop")
             #проверка своодного места
+            if self.AngRangeList[ind3pi2].get_range() > 0.5:
+                 #справа свободно
+                FREE_SPACE = 1
+                self.get_logger().info("справа свободно")
+                self.st4_f.set_result(1)
+            elif self.AngRangeList[ind3pi2].get_range() <= 0.5 and self.AngRangeList[indpi2].get_range() > 0.5:
+                 #слева свободно
+                FREE_SPACE = 0
+                self.get_logger().info("слева свободно")
+                self.st4_f.set_result(1)
+            else:
+                 #только разворот
+                FREE_SPACE = 2
+                self.get_logger().info("только разворот")
+            
             self.st4_f.set_result(1)
         self.cmd_vel_pub_.publish(msg)
         
 
 class RightHandRule_Pi2(LaserScanSubscriberNode):
     def laser_callback(self, msg: LaserScan):
+        global FREE_SPACE
         self.angle_min = msg.angle_min #задаем поля для углов
         self.angle_max = msg.angle_max
         self.angle_increment = msg.angle_increment
@@ -285,6 +310,8 @@ class RightHandRule_Pi2(LaserScanSubscriberNode):
         #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
 
         #------------------------------------------------- закончили обработку входных данных
+        self.get_logger().info("I am pi2 node")
+        
         msg = Twist()
 
         indpi2 , ind3pi2= 0, 0
@@ -297,11 +324,29 @@ class RightHandRule_Pi2(LaserScanSubscriberNode):
                 eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
                 ind3pi2 = i          
           
+        
+        minlenind = ranges.index(min(ranges))
+        msg = Twist()
+        
+        d = abs(self.AngRangeList[minlenind].get_angle() - self.AngRangeList[ind3pi2].get_angle()) 
+        if not(0.0 <= d < 0.2):
+            msg.angular.z = 0.35
+        else:
+            msg.angular.z = 0.0
+            self.get_logger().info("here")
+            self.st4_pi2.set_result(1)
+            
+        self.get_logger().info(str(self.AngRangeList[minlenind].get_angle()) + " " + str(self.AngRangeList[0].get_angle()))
+        self.cmd_vel_pub_.publish(msg)    
+            
+          
 
-        self.get_logger().info(self.AngRangeList[indpi2].toStr() + " " + self.AngRangeList[ind3pi2].toStr())
+
 
 class RightHandRule_3Pi2(LaserScanSubscriberNode):
+
     def laser_callback(self, msg: LaserScan):
+        global FREE_SPACE
         self.angle_min = msg.angle_min #задаем поля для углов
         self.angle_max = msg.angle_max
         self.angle_increment = msg.angle_increment
@@ -326,6 +371,7 @@ class RightHandRule_3Pi2(LaserScanSubscriberNode):
         #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
 
         #------------------------------------------------- закончили обработку входных данных
+        self.get_logger().info("I am 3pi2 node")
         msg = Twist()
 
         indpi2 , ind3pi2= 0, 0
@@ -338,12 +384,26 @@ class RightHandRule_3Pi2(LaserScanSubscriberNode):
                 eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
                 ind3pi2 = i          
           
+        minlenind = ranges.index(min(ranges))
+        msg = Twist()
+        
+        d = abs(self.AngRangeList[minlenind].get_angle() - self.AngRangeList[indpi2].get_angle()) 
+        if not(0.0 <= d < 0.2):
+            msg.angular.z = 0.35
+        else:
+            msg.angular.z = 0.0
+            self.get_logger().info("here")
+            self.st4_3pi2.set_result(1)
+            
+        self.cmd_vel_pub_.publish(msg)   
 
-        self.get_logger().info(self.AngRangeList[indpi2].toStr() + " " + self.AngRangeList[ind3pi2].toStr())
+        
 
 
-class RightHandRule_Turn2pi(LaserScanSubscriberNode):
+class RightHandRule_Turnpi(LaserScanSubscriberNode):
+    
     def laser_callback(self, msg: LaserScan):
+        global FREE_SPACE
         self.angle_min = msg.angle_min #задаем поля для углов
         self.angle_max = msg.angle_max
         self.angle_increment = msg.angle_increment
@@ -368,6 +428,7 @@ class RightHandRule_Turn2pi(LaserScanSubscriberNode):
         #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
 
         #------------------------------------------------- закончили обработку входных данных
+        self.get_logger().info("I am turnpi node")
         msg = Twist()
 
         indpi2 , ind3pi2= 0, 0
@@ -385,6 +446,8 @@ class RightHandRule_Turn2pi(LaserScanSubscriberNode):
 
 
 def main(args=None):
+    global FREE_SPACE
+
     rclpy.init(args=args)
     #nodet = Very_talkative_Node()
     #rclpy.spin_until_future_complete(node1, node1.f)
@@ -398,7 +461,27 @@ def main(args=None):
     node3 = TurnAlongTheWall()
     rclpy.spin_until_future_complete(node3, node3.st3)
     
-    node4 = RightHandRule_Forward()
-    rclpy.spin_until_future_complete(node4, node4.st4_f)
+    
+    
+    while True:
+        if FREE_SPACE == -1:
+            node4 = RightHandRule_Forward()
+            rclpy.spin_until_future_complete(node4, node4.st4_f)
+            
+        elif FREE_SPACE == 0:
+            node4 = RightHandRule_Pi2()
+            rclpy.spin_until_future_complete(node4, node4.st4_pi2)
+            FREE_SPACE = -1
+        elif FREE_SPACE == 1:
+            node4 = RightHandRule_3Pi2()
+            rclpy.spin_until_future_complete(node4, node4.st4_3pi2)
+            FREE_SPACE = -1
+        elif FREE_SPACE == 2:
+            node4 = RightHandRule_Turnpi()
+            rclpy.spin_until_future_complete(node4, node4.st4_turn2pi)
+            FREE_SPACE = -1
+
+        
+
     #print(node2.AngRangeList[int(3.14)].get_angle())
     rclpy.shutdown()
