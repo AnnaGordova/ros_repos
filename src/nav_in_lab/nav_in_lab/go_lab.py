@@ -241,13 +241,20 @@ class RightHandRule_Forward(LaserScanSubscriberNode):
             if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
                 eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
                 ind3pi2 = i          
-          #Добавь корректировку на угол
+          #Возможно доработать корректировку на угол
         if self.AngRangeList[0].get_range() > 0.5:
             msg.linear.x = 0.3
             self.get_logger().info("Chu-chu!" + " " + str(self.AngRangeList[0].get_range()))
+            if self.AngRangeList[ind3pi2].get_range() > 0.6:
+                msg.angular.z = -0.05
+                self.get_logger().info("Calibration 1..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
+            if self.AngRangeList[ind3pi2].get_range() < 0.5:
+                msg.angular.z = 0.05
+                self.get_logger().info("Calibration 2..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
         else:
             msg.linear.x = 0.0
             self.get_logger().info("Stop")
+            #проверка своодного места
             self.st4_f.set_result(1)
         self.cmd_vel_pub_.publish(msg)
         
