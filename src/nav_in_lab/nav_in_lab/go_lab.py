@@ -38,22 +38,26 @@ class LaserScanSubscriberNode(Node):
         self.st1 = Future()
         self.st2 = Future()
         self.st3 = Future()
-        self.st4 = Future()
+        self.st4_f = Future()
+        self.st4_pi2 = Future()
+        self.st4_3pi2 = Future()
+        self.st4_turn2pi = Future()
         super().__init__("Laser_subscriber")
         self.laser_subscriber_ = self.create_subscription(LaserScan, "/scan", self.laser_callback, 10)
         self.cmd_vel_pub_ = self.create_publisher(Twist, "/cmd_vel", 10)
 
-    def get_st1(self):
-        return self.st1
-    
-    def get_st2(self):
-        return self.st1
-    
-    def get_st3(self):
-        return self.st1
-    
-    def get_st4(self):
-        return self.st1
+    def get_st1(self): return self.st1  
+    def get_st2(self): return self.st1  
+    def get_st3(self): return self.st1   
+    def get_st4_f(self): return self.st4_f   
+    def get_st4_pi2(self): return self.st4_pi2    
+    def get_st4_3pi2(self): return self.st4_3pi2    
+    def get_st4_turn2pi(self): return self.st4_turn2pi
+
+    def set_st4_f(self, f): self.st4_f = f
+    def set_st4_pi2(self, f): self.st4_pi2 = f
+    def set_st4_3pi2(self, f): self.st4_3pi2 = f
+    def set_st4_turn2pi(self, f): self.st4_turn2pi = f
 
     def laser_callback(self, msg: LaserScan):
         self.angle_min = msg.angle_min #задаем поля для углов
@@ -68,7 +72,7 @@ class LaserScanSubscriberNode(Node):
             temp += self.angle_increment
 
         self.AngRangeList = [] #спсиок объектов класса угол-расстояние
-   
+        
         for i in range(0, len(angle_list)): #заполянем
             self.AngRangeList.append(LaserAngleAndDistance(angle_list[i], ranges[i]))
         
@@ -153,7 +157,7 @@ class GoForward(LaserScanSubscriberNode):
         self.get_logger().info(str(min_acceptable_range))
         msg = Twist()
         if min_acceptable_range > 0.6:
-            msg.linear.x = 1.0
+            msg.linear.x = 0.4
             self.get_logger().info("Riding...")
         else:
             msg.linear.x = 0.0
@@ -200,12 +204,184 @@ class TurnAlongTheWall(LaserScanSubscriberNode):
         self.get_logger().info(str(self.AngRangeList[minlenind].get_angle()) + " " + str(self.AngRangeList[0].get_angle()))
         self.cmd_vel_pub_.publish(msg)   
         
+class RightHandRule_Forward(LaserScanSubscriberNode):
+    def laser_callback(self, msg: LaserScan):
+        self.angle_min = msg.angle_min #задаем поля для углов
+        self.angle_max = msg.angle_max
+        self.angle_increment = msg.angle_increment
+        
+        ranges = msg.ranges #список расстояний
+        angle_list = [] #список углов
+        temp = self.angle_min
+        while temp <= self.angle_max: #заполняем спсиок промежуточных значений углов 
+            angle_list.append(temp)
+            temp += self.angle_increment
+
+        self.AngRangeList = [] #спсиок объектов класса угол-расстояние
+   
+        for i in range(0, len(angle_list)): #заполянем
+            self.AngRangeList.append(LaserAngleAndDistance(angle_list[i], ranges[i]))
+        
+        '''
+        for i in range(0, len(self.AngRangeList)): # вывод для красоты
+            self.get_logger().info(self.AngRangeList[i].toStr())'''
+        
+        
+        #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
+
+        #------------------------------------------------- закончили обработку входных данных
+        msg = Twist()
+
+        indpi2 , ind3pi2= 0, 0
+        eps1, eps2 = 10000000000, 10000000000
+        for i in range(0, len(angle_list)):
+            if abs(angle_list[i] - 3.14/2) < eps1:
+                eps1 = abs(angle_list[i] - 3.14/2)
+                indpi2 = i    
+            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
+                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
+                ind3pi2 = i          
+          #Добавь корректировку на угол
+        if self.AngRangeList[0].get_range() > 0.5:
+            msg.linear.x = 0.3
+            self.get_logger().info("Chu-chu!" + " " + str(self.AngRangeList[0].get_range()))
+        else:
+            msg.linear.x = 0.0
+            self.get_logger().info("Stop")
+            self.st4_f.set_result(1)
+        self.cmd_vel_pub_.publish(msg)
+        
+
+class RightHandRule_Pi2(LaserScanSubscriberNode):
+    def laser_callback(self, msg: LaserScan):
+        self.angle_min = msg.angle_min #задаем поля для углов
+        self.angle_max = msg.angle_max
+        self.angle_increment = msg.angle_increment
+        
+        ranges = msg.ranges #список расстояний
+        angle_list = [] #список углов
+        temp = self.angle_min
+        while temp <= self.angle_max: #заполняем спсиок промежуточных значений углов 
+            angle_list.append(temp)
+            temp += self.angle_increment
+
+        self.AngRangeList = [] #спсиок объектов класса угол-расстояние
+   
+        for i in range(0, len(angle_list)): #заполянем
+            self.AngRangeList.append(LaserAngleAndDistance(angle_list[i], ranges[i]))
+        
+        '''
+        for i in range(0, len(self.AngRangeList)): # вывод для красоты
+            self.get_logger().info(self.AngRangeList[i].toStr())'''
+        
+        
+        #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
+
+        #------------------------------------------------- закончили обработку входных данных
+        msg = Twist()
+
+        indpi2 , ind3pi2= 0, 0
+        eps1, eps2 = 10000000000, 10000000000
+        for i in range(0, len(angle_list)):
+            if abs(angle_list[i] - 3.14/2) < eps1:
+                eps1 = abs(angle_list[i] - 3.14/2)
+                indpi2 = i    
+            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
+                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
+                ind3pi2 = i          
+          
+
+        self.get_logger().info(self.AngRangeList[indpi2].toStr() + " " + self.AngRangeList[ind3pi2].toStr())
+
+class RightHandRule_3Pi2(LaserScanSubscriberNode):
+    def laser_callback(self, msg: LaserScan):
+        self.angle_min = msg.angle_min #задаем поля для углов
+        self.angle_max = msg.angle_max
+        self.angle_increment = msg.angle_increment
+        
+        ranges = msg.ranges #список расстояний
+        angle_list = [] #список углов
+        temp = self.angle_min
+        while temp <= self.angle_max: #заполняем спсиок промежуточных значений углов 
+            angle_list.append(temp)
+            temp += self.angle_increment
+
+        self.AngRangeList = [] #спсиок объектов класса угол-расстояние
+   
+        for i in range(0, len(angle_list)): #заполянем
+            self.AngRangeList.append(LaserAngleAndDistance(angle_list[i], ranges[i]))
+        
+        '''
+        for i in range(0, len(self.AngRangeList)): # вывод для красоты
+            self.get_logger().info(self.AngRangeList[i].toStr())'''
+        
+        
+        #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
+
+        #------------------------------------------------- закончили обработку входных данных
+        msg = Twist()
+
+        indpi2 , ind3pi2= 0, 0
+        eps1, eps2 = 10000000000, 10000000000
+        for i in range(0, len(angle_list)):
+            if abs(angle_list[i] - 3.14/2) < eps1:
+                eps1 = abs(angle_list[i] - 3.14/2)
+                indpi2 = i    
+            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
+                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
+                ind3pi2 = i          
+          
+
+        self.get_logger().info(self.AngRangeList[indpi2].toStr() + " " + self.AngRangeList[ind3pi2].toStr())
+
+
+class RightHandRule_Turn2pi(LaserScanSubscriberNode):
+    def laser_callback(self, msg: LaserScan):
+        self.angle_min = msg.angle_min #задаем поля для углов
+        self.angle_max = msg.angle_max
+        self.angle_increment = msg.angle_increment
+        
+        ranges = msg.ranges #список расстояний
+        angle_list = [] #список углов
+        temp = self.angle_min
+        while temp <= self.angle_max: #заполняем спсиок промежуточных значений углов 
+            angle_list.append(temp)
+            temp += self.angle_increment
+
+        self.AngRangeList = [] #спсиок объектов класса угол-расстояние
+   
+        for i in range(0, len(angle_list)): #заполянем
+            self.AngRangeList.append(LaserAngleAndDistance(angle_list[i], ranges[i]))
+        
+        '''
+        for i in range(0, len(self.AngRangeList)): # вывод для красоты
+            self.get_logger().info(self.AngRangeList[i].toStr())'''
+        
+        
+        #self.get_logger().info(self.AngRangeList[5].toStr()) #вывод для проверки
+
+        #------------------------------------------------- закончили обработку входных данных
+        msg = Twist()
+
+        indpi2 , ind3pi2= 0, 0
+        eps1, eps2 = 10000000000, 10000000000
+        for i in range(0, len(angle_list)):
+            if abs(angle_list[i] - 3.14/2) < eps1:
+                eps1 = abs(angle_list[i] - 3.14/2)
+                indpi2 = i    
+            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
+                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
+                ind3pi2 = i          
+          
+
+        self.get_logger().info(self.AngRangeList[indpi2].toStr() + " " + self.AngRangeList[ind3pi2].toStr())
+
 
 def main(args=None):
     rclpy.init(args=args)
     #nodet = Very_talkative_Node()
     #rclpy.spin_until_future_complete(node1, node1.f)
-
+    
     node1 = TurnToRightSide() 
     rclpy.spin_until_future_complete(node1, node1.st1)
 
@@ -214,5 +390,8 @@ def main(args=None):
 
     node3 = TurnAlongTheWall()
     rclpy.spin_until_future_complete(node3, node3.st3)
+    
+    node4 = RightHandRule_Forward()
+    rclpy.spin_until_future_complete(node4, node4.st4_f)
     #print(node2.AngRangeList[int(3.14)].get_angle())
     rclpy.shutdown()
