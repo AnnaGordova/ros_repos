@@ -437,7 +437,7 @@ def main(args=None):
     
     while True:
         TIME_BEGIN = time.time()
-        print(TIME_BEGIN)
+        #print(TIME_BEGIN)
 
         if FREE_SPACE == -1:
             
