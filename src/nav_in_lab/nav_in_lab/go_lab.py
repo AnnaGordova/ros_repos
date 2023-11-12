@@ -4,7 +4,12 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
 from rclpy.task import Future
+import time
+
 FREE_SPACE = -1 # -1 - не определено, 1 - свободно справа, 0 - свободно слева, а справа нет, 2 - только разворот
+TIME_END = -1
+TIME_BEGIN = None
+
 class LaserAngleAndDistance: #класс угол-расстояние
     
     def __init__(self, angle, range):
@@ -35,14 +40,15 @@ class Very_talkative_Node(Node):
        
 class LaserScanSubscriberNode(Node):
     def __init__(self):
+        global TIME_BEGIN
         self.st1 = Future()
         self.st2 = Future()
         self.st3 = Future()
         self.st4_f = Future()
         self.st4_pi2 = Future()
         self.st4_3pi2 = Future()
-        self.st4_turn2pi = Future()
-
+        self.st4_turnpi = Future()
+        TIME_BEGIN = time.time()
         
         super().__init__("Laser_subscriber")
         self.laser_subscriber_ = self.create_subscription(LaserScan, "/scan", self.laser_callback, 10)
@@ -63,7 +69,7 @@ class LaserScanSubscriberNode(Node):
     def set_st4_3pi2(self, f): self.st4_3pi2 = f
     def set_st4_turnpi(self, f): self.st4_turnpi = f
 
-
+    TIME_BEGIN = time.time()
 
     def laser_callback(self, msg: LaserScan):
         self.angle_min = msg.angle_min #задаем поля для углов
@@ -162,8 +168,8 @@ class GoForward(LaserScanSubscriberNode):
         min_acceptable_range = min(self.AngRangeList[i].get_range() for i in self.need_indexes)
         self.get_logger().info(str(min_acceptable_range))
         msg = Twist()
-        if min_acceptable_range > 0.6:
-            msg.linear.x = 0.4
+        if min_acceptable_range > 0.7:
+            msg.linear.x = 0.3
             self.get_logger().info("Riding...")
         else:
             msg.linear.x = 0.0
@@ -285,7 +291,7 @@ class RightHandRule_Forward(LaserScanSubscriberNode):
 
 class RightHandRule_Pi2(LaserScanSubscriberNode):
     def laser_callback(self, msg: LaserScan):
-        global FREE_SPACE
+        global FREE_SPACE, TIME_BEGIN, TIME_END
         self.angle_min = msg.angle_min #задаем поля для углов
         self.angle_max = msg.angle_max
         self.angle_increment = msg.angle_increment
@@ -313,32 +319,14 @@ class RightHandRule_Pi2(LaserScanSubscriberNode):
         self.get_logger().info("I am pi2 node")
         
         msg = Twist()
+        
+        msg.angular.z = 0.35
+        self.cmd_vel_pub_.publish(msg)  
 
-        indpi2 , ind3pi2= 0, 0
-        eps1, eps2 = 10000000000, 10000000000
-        for i in range(0, len(angle_list)):
-            if abs(angle_list[i] - 3.14/2) < eps1:
-                eps1 = abs(angle_list[i] - 3.14/2)
-                indpi2 = i    
-            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
-                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
-                ind3pi2 = i          
-          
-        
-        minlenind = ranges.index(min(ranges))
-        msg = Twist()
-        
-        d = abs(self.AngRangeList[minlenind].get_angle() - self.AngRangeList[ind3pi2].get_angle()) 
-        if not(0.0 <= d < 0.2):
-            msg.angular.z = 0.35
-        else:
-            msg.angular.z = 0.0
-            self.get_logger().info("here")
+        TIME_END = time.time()  
+        if TIME_END - TIME_BEGIN >= 4.5:
             self.st4_pi2.set_result(1)
-            
-        self.get_logger().info(str(self.AngRangeList[minlenind].get_angle()) + " " + str(self.AngRangeList[0].get_angle()))
-        self.cmd_vel_pub_.publish(msg)    
-            
+        
           
 
 
@@ -374,28 +362,14 @@ class RightHandRule_3Pi2(LaserScanSubscriberNode):
         self.get_logger().info("I am 3pi2 node")
         msg = Twist()
 
-        indpi2 , ind3pi2= 0, 0
-        eps1, eps2 = 10000000000, 10000000000
-        for i in range(0, len(angle_list)):
-            if abs(angle_list[i] - 3.14/2) < eps1:
-                eps1 = abs(angle_list[i] - 3.14/2)
-                indpi2 = i    
-            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
-                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
-                ind3pi2 = i          
-          
-        minlenind = ranges.index(min(ranges))
-        msg = Twist()
-        
-        d = abs(self.AngRangeList[minlenind].get_angle() - self.AngRangeList[indpi2].get_angle()) 
-        if not(0.0 <= d < 0.2):
-            msg.angular.z = 0.35
-        else:
-            msg.angular.z = 0.0
-            self.get_logger().info("here")
-            self.st4_3pi2.set_result(1)
-            
+        msg.angular.z = -0.35
         self.cmd_vel_pub_.publish(msg)   
+
+        TIME_END = time.time()  
+        self.get_logger().info(str(TIME_END) + " " + str(TIME_BEGIN) + " " + str(TIME_END - TIME_BEGIN))
+        if TIME_END - TIME_BEGIN >= 4.5:
+            self.get_logger().info('yes')
+            self.st4_3pi2.set_result(1) 
 
         
 
@@ -429,20 +403,14 @@ class RightHandRule_Turnpi(LaserScanSubscriberNode):
 
         #------------------------------------------------- закончили обработку входных данных
         self.get_logger().info("I am turnpi node")
+        
         msg = Twist()
+        msg.angular.z = 0.35
+        self.cmd_vel_pub_.publish(msg)   
 
-        indpi2 , ind3pi2= 0, 0
-        eps1, eps2 = 10000000000, 10000000000
-        for i in range(0, len(angle_list)):
-            if abs(angle_list[i] - 3.14/2) < eps1:
-                eps1 = abs(angle_list[i] - 3.14/2)
-                indpi2 = i    
-            if abs(angle_list[i] - (6.28 - 3.14/2)) < eps2:
-                eps2 = abs(angle_list[i] - (6.28 - 3.14/2))
-                ind3pi2 = i          
-          
-
-        self.get_logger().info(self.AngRangeList[indpi2].toStr() + " " + self.AngRangeList[ind3pi2].toStr())
+        TIME_END = time.time() 
+        if TIME_END - TIME_BEGIN >= 5:
+            self.st4_turnpi.set_result(1) 
 
 
 def main(args=None):
@@ -464,21 +432,31 @@ def main(args=None):
     
     
     while True:
+        TIME_BEGIN = time.time()
+        print(TIME_BEGIN)
+
         if FREE_SPACE == -1:
+            
             node4 = RightHandRule_Forward()
             rclpy.spin_until_future_complete(node4, node4.st4_f)
             
         elif FREE_SPACE == 0:
+
             node4 = RightHandRule_Pi2()
             rclpy.spin_until_future_complete(node4, node4.st4_pi2)
             FREE_SPACE = -1
+            
         elif FREE_SPACE == 1:
+
             node4 = RightHandRule_3Pi2()
             rclpy.spin_until_future_complete(node4, node4.st4_3pi2)
             FREE_SPACE = -1
+            
         elif FREE_SPACE == 2:
+
             node4 = RightHandRule_Turnpi()
-            rclpy.spin_until_future_complete(node4, node4.st4_turn2pi)
+            rclpy.spin_until_future_complete(node4, node4.st4_turnpi)
+            
             FREE_SPACE = -1
 
         

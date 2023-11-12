@@ -1,0 +1,9 @@
+source;share/Raspberry/hook/pythonpath.ps1
+source;share/Raspberry/hook/pythonpath.dsv
+source;share/Raspberry/hook/pythonpath.sh
+source;share/Raspberry/hook/ament_prefix_path.ps1
+source;share/Raspberry/hook/ament_prefix_path.dsv
+source;share/Raspberry/hook/ament_prefix_path.sh
+source;../../build/Raspberry/share/Raspberry/hook/pythonpath_develop.ps1
+source;../../build/Raspberry/share/Raspberry/hook/pythonpath_develop.dsv
+source;../../build/Raspberry/share/Raspberry/hook/pythonpath_develop.sh

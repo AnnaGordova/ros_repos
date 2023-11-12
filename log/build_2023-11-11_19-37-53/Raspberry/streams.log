@@ -1,0 +1,33 @@
+[2.017s] Invoking command in '/home/anna/ros2_ws/src/Raspberry': PYTHONPATH=/home/anna/ros2_ws/build/Raspberry/prefix_override:/home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/Raspberry build --build-base /home/anna/ros2_ws/build/Raspberry/build install --record /home/anna/ros2_ws/build/Raspberry/install.log --single-version-externally-managed
+[2.253s] running egg_info
+[2.253s] creating ../../build/Raspberry/Raspberry.egg-info
+[2.253s] writing ../../build/Raspberry/Raspberry.egg-info/PKG-INFO
+[2.253s] writing dependency_links to ../../build/Raspberry/Raspberry.egg-info/dependency_links.txt
+[2.254s] writing entry points to ../../build/Raspberry/Raspberry.egg-info/entry_points.txt
+[2.254s] writing requirements to ../../build/Raspberry/Raspberry.egg-info/requires.txt
+[2.254s] writing top-level names to ../../build/Raspberry/Raspberry.egg-info/top_level.txt
+[2.254s] writing manifest file '../../build/Raspberry/Raspberry.egg-info/SOURCES.txt'
+[2.256s] reading manifest file '../../build/Raspberry/Raspberry.egg-info/SOURCES.txt'
+[2.256s] writing manifest file '../../build/Raspberry/Raspberry.egg-info/SOURCES.txt'
+[2.257s] running build
+[2.257s] running build_py
+[2.257s] creating /home/anna/ros2_ws/build/Raspberry/build
+[2.257s] creating /home/anna/ros2_ws/build/Raspberry/build/lib
+[2.257s] creating /home/anna/ros2_ws/build/Raspberry/build/lib/Raspberry
+[2.257s] copying Raspberry/__init__.py -> /home/anna/ros2_ws/build/Raspberry/build/lib/Raspberry
+[2.258s] running install
+[2.258s] running install_lib
+[2.258s] creating /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry
+[2.258s] copying /home/anna/ros2_ws/build/Raspberry/build/lib/Raspberry/__init__.py -> /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry
+[2.259s] byte-compiling /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry/__init__.py to __init__.cpython-310.pyc
+[2.259s] running install_data
+[2.260s] creating /home/anna/ros2_ws/install/Raspberry/share/ament_index
+[2.260s] creating /home/anna/ros2_ws/install/Raspberry/share/ament_index/resource_index
+[2.260s] creating /home/anna/ros2_ws/install/Raspberry/share/ament_index/resource_index/packages
+[2.260s] copying resource/Raspberry -> /home/anna/ros2_ws/install/Raspberry/share/ament_index/resource_index/packages
+[2.260s] copying package.xml -> /home/anna/ros2_ws/install/Raspberry/share/Raspberry
+[2.260s] running install_egg_info
+[2.261s] Copying ../../build/Raspberry/Raspberry.egg-info to /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry-0.0.0-py3.10.egg-info
+[2.262s] running install_scripts
+[2.281s] writing list of installed files to '/home/anna/ros2_ws/build/Raspberry/install.log'
+[2.315s] Invoked command in '/home/anna/ros2_ws/src/Raspberry' returned '0': PYTHONPATH=/home/anna/ros2_ws/build/Raspberry/prefix_override:/home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/Raspberry build --build-base /home/anna/ros2_ws/build/Raspberry/build install --record /home/anna/ros2_ws/build/Raspberry/install.log --single-version-externally-managed

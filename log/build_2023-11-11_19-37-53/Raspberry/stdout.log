@@ -1,0 +1,31 @@
+running egg_info
+creating ../../build/Raspberry/Raspberry.egg-info
+writing ../../build/Raspberry/Raspberry.egg-info/PKG-INFO
+writing dependency_links to ../../build/Raspberry/Raspberry.egg-info/dependency_links.txt
+writing entry points to ../../build/Raspberry/Raspberry.egg-info/entry_points.txt
+writing requirements to ../../build/Raspberry/Raspberry.egg-info/requires.txt
+writing top-level names to ../../build/Raspberry/Raspberry.egg-info/top_level.txt
+writing manifest file '../../build/Raspberry/Raspberry.egg-info/SOURCES.txt'
+reading manifest file '../../build/Raspberry/Raspberry.egg-info/SOURCES.txt'
+writing manifest file '../../build/Raspberry/Raspberry.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/anna/ros2_ws/build/Raspberry/build
+creating /home/anna/ros2_ws/build/Raspberry/build/lib
+creating /home/anna/ros2_ws/build/Raspberry/build/lib/Raspberry
+copying Raspberry/__init__.py -> /home/anna/ros2_ws/build/Raspberry/build/lib/Raspberry
+running install
+running install_lib
+creating /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry
+copying /home/anna/ros2_ws/build/Raspberry/build/lib/Raspberry/__init__.py -> /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry
+byte-compiling /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/anna/ros2_ws/install/Raspberry/share/ament_index
+creating /home/anna/ros2_ws/install/Raspberry/share/ament_index/resource_index
+creating /home/anna/ros2_ws/install/Raspberry/share/ament_index/resource_index/packages
+copying resource/Raspberry -> /home/anna/ros2_ws/install/Raspberry/share/ament_index/resource_index/packages
+copying package.xml -> /home/anna/ros2_ws/install/Raspberry/share/Raspberry
+running install_egg_info
+Copying ../../build/Raspberry/Raspberry.egg-info to /home/anna/ros2_ws/install/Raspberry/lib/python3.10/site-packages/Raspberry-0.0.0-py3.10.egg-info
+running install_scripts
+writing list of installed files to '/home/anna/ros2_ws/build/Raspberry/install.log'

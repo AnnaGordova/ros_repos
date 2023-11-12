@@ -1,0 +1,32 @@
+[1.789s] Invoking command in '/home/anna/ros2_ws/build/turtlebot4_space': PYTHONPATH=/home/anna/ros2_ws/build/turtlebot4_space/prefix_override:/home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --uninstall --editable --build-directory /home/anna/ros2_ws/build/turtlebot4_space/build
+[2.044s] running develop
+[2.208s] Removing /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4-space.egg-link (link to .)
+[2.251s] Invoked command in '/home/anna/ros2_ws/build/turtlebot4_space' returned '0': PYTHONPATH=/home/anna/ros2_ws/build/turtlebot4_space/prefix_override:/home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --uninstall --editable --build-directory /home/anna/ros2_ws/build/turtlebot4_space/build
+[2.252s] Invoking command in '/home/anna/ros2_ws/src/turtlebot4_space': PYTHONPATH=/home/anna/ros2_ws/build/turtlebot4_space/prefix_override:/home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/turtlebot4_space build --build-base /home/anna/ros2_ws/build/turtlebot4_space/build install --record /home/anna/ros2_ws/build/turtlebot4_space/install.log --single-version-externally-managed
+[2.478s] running egg_info
+[2.478s] writing ../../build/turtlebot4_space/turtlebot4_space.egg-info/PKG-INFO
+[2.478s] writing dependency_links to ../../build/turtlebot4_space/turtlebot4_space.egg-info/dependency_links.txt
+[2.478s] writing entry points to ../../build/turtlebot4_space/turtlebot4_space.egg-info/entry_points.txt
+[2.479s] writing requirements to ../../build/turtlebot4_space/turtlebot4_space.egg-info/requires.txt
+[2.479s] writing top-level names to ../../build/turtlebot4_space/turtlebot4_space.egg-info/top_level.txt
+[2.480s] reading manifest file '../../build/turtlebot4_space/turtlebot4_space.egg-info/SOURCES.txt'
+[2.485s] writing manifest file '../../build/turtlebot4_space/turtlebot4_space.egg-info/SOURCES.txt'
+[2.486s] running build
+[2.486s] running build_py
+[2.486s] running install
+[2.486s] running install_lib
+[2.486s] creating /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space
+[2.487s] copying /home/anna/ros2_ws/build/turtlebot4_space/build/lib/turtlebot4_space/draw_square_1.py -> /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space
+[2.487s] copying /home/anna/ros2_ws/build/turtlebot4_space/build/lib/turtlebot4_space/draw_square.py -> /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space
+[2.487s] copying /home/anna/ros2_ws/build/turtlebot4_space/build/lib/turtlebot4_space/__init__.py -> /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space
+[2.487s] byte-compiling /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space/draw_square_1.py to draw_square_1.cpython-310.pyc
+[2.488s] byte-compiling /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space/draw_square.py to draw_square.cpython-310.pyc
+[2.488s] byte-compiling /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space/__init__.py to __init__.cpython-310.pyc
+[2.488s] running install_data
+[2.489s] running install_egg_info
+[2.490s] Copying ../../build/turtlebot4_space/turtlebot4_space.egg-info to /home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages/turtlebot4_space-0.0.0-py3.10.egg-info
+[2.492s] running install_scripts
+[2.510s] Installing draw_square script to /home/anna/ros2_ws/install/turtlebot4_space/lib/turtlebot4_space
+[2.510s] Installing draw_square_1 script to /home/anna/ros2_ws/install/turtlebot4_space/lib/turtlebot4_space
+[2.510s] writing list of installed files to '/home/anna/ros2_ws/build/turtlebot4_space/install.log'
+[2.548s] Invoked command in '/home/anna/ros2_ws/src/turtlebot4_space' returned '0': PYTHONPATH=/home/anna/ros2_ws/build/turtlebot4_space/prefix_override:/home/anna/ros2_ws/install/turtlebot4_space/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/turtlebot4_space build --build-base /home/anna/ros2_ws/build/turtlebot4_space/build install --record /home/anna/ros2_ws/build/turtlebot4_space/install.log --single-version-externally-managed
