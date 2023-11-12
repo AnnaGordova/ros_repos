@@ -260,30 +260,34 @@ class RightHandRule_Forward(LaserScanSubscriberNode):
         if self.AngRangeList[0].get_range() > 0.5:
             msg.linear.x = 0.3
             self.get_logger().info("Chu-chu!" + " " + str(self.AngRangeList[0].get_range()))
-            if self.AngRangeList[ind3pi2].get_range() > 0.6:
-                msg.angular.z = 0.05
+            if self.AngRangeList[ind3pi2].get_range() >= 0.6:
+                msg.angular.z = 0.09
                 self.get_logger().info("Calibration 1..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
-            if self.AngRangeList[ind3pi2].get_range() < 0.5:
-                msg.angular.z = -0.05
+            elif self.AngRangeList[ind3pi2].get_range() < 0.5:
+                msg.angular.z = -0.09
                 self.get_logger().info("Calibration 2..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
+            elif 0.5 <= self.AngRangeList[ind3pi2].get_range() < 0.6:
+                msg.angular.z = 0.00
+                self.get_logger().info("Calibration 3..." + " " + str(self.AngRangeList[ind3pi2].get_range()))
         else:
             msg.linear.x = 0.0
             self.get_logger().info("Stop")
             #проверка своодного места
-            if self.AngRangeList[ind3pi2].get_range() > 0.5:
+            if self.AngRangeList[ind3pi2].get_range() < self.AngRangeList[indpi2].get_range():
                  #справа свободно
                 FREE_SPACE = 1
                 self.get_logger().info("справа свободно")
                 self.st4_f.set_result(1)
-            elif self.AngRangeList[ind3pi2].get_range() <= 0.5 and self.AngRangeList[indpi2].get_range() > 0.5:
+            elif self.AngRangeList[ind3pi2].get_range() > self.AngRangeList[indpi2].get_range():
                  #слева свободно
                 FREE_SPACE = 0
                 self.get_logger().info("слева свободно")
                 self.st4_f.set_result(1)
-            else:
+            elif self.AngRangeList[ind3pi2].get_range() < 0.5 and self.AngRangeList[indpi2].get_range() < 0.5:
                  #только разворот
                 FREE_SPACE = 2
                 self.get_logger().info("только разворот")
+                self.st4_f.set_result(1)
             
             self.st4_f.set_result(1)
         self.cmd_vel_pub_.publish(msg)
@@ -409,7 +413,7 @@ class RightHandRule_Turnpi(LaserScanSubscriberNode):
         self.cmd_vel_pub_.publish(msg)   
 
         TIME_END = time.time() 
-        if TIME_END - TIME_BEGIN >= 5:
+        if TIME_END - TIME_BEGIN >= 9:
             self.st4_turnpi.set_result(1) 
 
 
@@ -440,13 +444,13 @@ def main(args=None):
             node4 = RightHandRule_Forward()
             rclpy.spin_until_future_complete(node4, node4.st4_f)
             
-        elif FREE_SPACE == 0:
+        elif FREE_SPACE == 1:
 
             node4 = RightHandRule_Pi2()
             rclpy.spin_until_future_complete(node4, node4.st4_pi2)
             FREE_SPACE = -1
             
-        elif FREE_SPACE == 1:
+        elif FREE_SPACE == 0:
 
             node4 = RightHandRule_3Pi2()
             rclpy.spin_until_future_complete(node4, node4.st4_3pi2)
